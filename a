@@ -1,0 +1,22 @@
+mkdir components, pages, contexts, services, hooks, utils, assets, styles
+mkdir controllers, routes, middlewares, models, services, utils, config
+
+
+Pantallas clave y funcionalidades (sin Feedback)
+Pantalla de Registro / Login
+
+Perfil del Usuario
+
+Dashboard / Inicio
+
+Visualización de Rutina Semanal
+
+Formulario de Registro de Progreso
+
+Pantalla de Progreso y Analíticas
+
+Chat Dinámico Basado en Progreso
+
+Menú de Navegación
+
+Accesos a: Inicio, Perfil, Rutina, Progreso, Chat, Cerrar sesión.

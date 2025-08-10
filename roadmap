@@ -1,0 +1,53 @@
+Funciones clave para tu app de tracker y mediciones (versión consolidada y actualizada)
+1. Registro y seguimiento de peso y medidas periódicas
+Permitir que el usuario registre su peso actual con fecha (cuando quiera o con frecuencia definida).
+
+Calcular automáticamente el IMC usando peso y altura.
+
+Mostrar gráficos de evolución del peso y IMC para que el usuario vea su progreso visualmente.
+
+2. Seguimiento de días de entrenamiento
+Mostrar calendario o vista semanal con los días que el usuario planea entrenar (trainingDays).
+
+Permitir marcar si entrenó o no ese día, para llevar un historial real.
+
+Mostrar estadísticas sencillas, como porcentaje de días entrenados respecto a los planificados.
+
+3. Registro y seguimiento de ejercicios realizados
+Ofrecer una lista predefinida de ejercicios categorizados (pierna, pecho, espalda, brazos, cardio, estiramientos, etc.) para que el usuario seleccione al registrar su entrenamiento.
+
+Permitir que el usuario registre ejercicios realizados en cada sesión con detalles (repeticiones, peso usado, duración según tipo de ejercicio).
+
+Mostrar resúmenes semanales o mensuales con la cantidad de entrenamientos y ejercicios realizados.
+
+4. Plan personalizado y actualización dinámica
+Generar una rutina semanal inicial basada en perfil, nivel, objetivo, días disponibles, sexo, etc.
+
+Mostrar recomendaciones diarias de ejercicios según la rutina asignada para ese día.
+
+Permitir que el usuario modifique el plan diario (por ejemplo, cambiar categoría de grupo muscular a entrenar).
+
+Ajustar automáticamente la rutina semanal para mantener balance y evitar sobrecargas musculares según los registros reales del usuario.
+
+Adaptar la rutina cuando el usuario edita su perfil o cambia días de entrenamiento.
+
+5. Objetivos, progreso y motivación
+Permitir definir objetivos personales (pérdida de peso, ganancia muscular, mantenimiento).
+
+Mostrar el progreso hacia esos objetivos basado en peso, IMC y frecuencia de entrenamientos.
+
+Enviar mensajes motivacionales o recomendaciones básicas según el avance.
+
+6. Registro de hábitos saludables diarios
+Registrar si el usuario cumple con la cantidad recomendada de agua diaria.
+
+Registrar la calidad del sueño (bien, regular, mal).
+
+Registrar cardio realizado (tipo: caminar, correr; duración en minutos).
+
+7. Cálculo automático de edad
+Usar la fecha de nacimiento para calcular y mostrar la edad actual del usuario, para personalizar recomendaciones.
+
+8. Recomendaciones basadas en experiencia
+Según el nivel de experiencia (principiante, intermedio, avanzado), ofrecer recomendaciones sobre frecuencia de entrenamiento, descanso, hidratación y cuidado para evitar lesiones.
+

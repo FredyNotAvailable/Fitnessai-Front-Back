@@ -1,0 +1,12 @@
+# Ignorar credenciales sensibles de Firebase / Google Cloud
+/src/config/serviceAccountKey.json
+
+# Variables de entorno
+.env
+
+# Carpetas de build/output
+build/
+out/
+
+# Node modules (si usas node_modules dentro de backend)
+node_modules/
