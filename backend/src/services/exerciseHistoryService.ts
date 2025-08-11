@@ -63,6 +63,25 @@ export async function getExerciseHistoriesByUser(userId: string): Promise<Exerci
 }
 //
 
+// Obtener historial por userId y fecha específica (fecha ISO string)
+export async function getExerciseHistoriesByUserAndDate(userId: string, date: string): Promise<ExerciseHistory[]> {
+  const querySnapshot = await db
+    .collection(HISTORY_COLLECTION)
+    .where('userId', '==', userId)
+    .where('date', '==', date)
+    .orderBy('date', 'desc')
+    .get();
+
+  const histories: ExerciseHistory[] = [];
+  querySnapshot.forEach(doc => {
+    const data = doc.data()!;
+    histories.push({ id: doc.id, ...data } as ExerciseHistory);
+  });
+
+  return histories;
+}
+
+
 // Actualizar historial
 export async function updateExerciseHistory(
   id: string,

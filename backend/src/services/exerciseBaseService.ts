@@ -37,6 +37,11 @@ export async function getExercise(id: string): Promise<ExerciseBase | null> {
   return { id: doc.id, ...data } as ExerciseBase;
 }
 
+export async function getAllExercises(): Promise<ExerciseBase[]> {
+  const snapshot = await db.collection(EXERCISES_COLLECTION).get();
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ExerciseBase[];
+}
+
 export async function updateExercise(id: string, data: Partial<ExerciseBase>): Promise<ExerciseBase | null> {
   const exerciseRef = db.collection(EXERCISES_COLLECTION).doc(id);
   const doc = await exerciseRef.get();

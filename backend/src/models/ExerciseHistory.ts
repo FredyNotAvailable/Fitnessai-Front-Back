@@ -1,4 +1,4 @@
-// src/ExerciseHistory.ts
+// src/models/ExerciseHistory.ts
 
 export interface ExerciseHistory {
   id: string;

@@ -24,6 +24,12 @@ export async function getWaterHistoriesByUser(userId: string): Promise<WaterHist
   });
 }
 
+export async function getWaterHistoryByUserAndDate(userId: string, date: string): Promise<WaterHistory | null> {
+  return apiRequest<WaterHistory | null>(`${BASE_PATH}/user/${userId}/date/${date}`, {
+    method: 'GET',
+  });
+}
+
 export async function updateWaterHistory(id: string, data: Partial<Omit<WaterHistory, 'id'>>): Promise<WaterHistory> {
   return apiRequest<WaterHistory>(`${BASE_PATH}/update/${id}`, {
     method: 'PUT',

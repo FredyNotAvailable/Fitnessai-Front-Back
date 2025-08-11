@@ -8,5 +8,5 @@ export interface ExerciseHistory {
   sets: number;
   reps: number;
   weight: number;
-  notes?: string;
+  notes: string;
 }

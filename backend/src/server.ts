@@ -50,8 +50,6 @@ app.use('/api/cardio-history', cardioHistoryRoutes);
 app.use('/api/sleep-history', sleepHistoryRoutes);
 // Rutas para historial de peso
 app.use('/api/weight-history', weightHistoryRoutes);
-// Rutas para historial de agua
-app.use('/api/weight-history', weightHistoryRoutes);
 // Rutas para historial de entrenamiento
 app.use('/api/training-log', trainingLogRoutes);
 

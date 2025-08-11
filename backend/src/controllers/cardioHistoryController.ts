@@ -36,6 +36,23 @@ export async function getCardioHistoriesByUser(req: Request, res: Response) {
   }
 }
 
+// NUEVO: Obtener historial de cardio por userId y date
+export async function getCardioHistoryByUserAndDate(req: Request, res: Response) {
+  try {
+    const { userId, date } = req.params;
+    if (!userId || !date) {
+      return res.status(400).json({ error: 'userId and date parameters are required' });
+    }
+    const history = await cardioHistoryService.getCardioHistoryByUserAndDate(userId, date);
+    if (!history) return res.status(404).json({ error: 'CardioHistory not found for given user and date' });
+    return res.json(history);
+  } catch (error) {
+    console.error('Error getting cardio history by user and date:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+/////
+
 export async function updateCardioHistory(req: Request, res: Response) {
   try {
     const { id } = req.params;

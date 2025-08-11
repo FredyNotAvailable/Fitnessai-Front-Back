@@ -16,6 +16,13 @@ export async function getExerciseBase(id: string): Promise<ExerciseBase | null> 
   });
 }
 
+export async function getAllExerciseBases(): Promise<ExerciseBase[]> {
+  return apiRequest<ExerciseBase[]>(`/exercise-base`, {
+    method: 'GET',
+  });
+}
+
+
 export async function updateExerciseBase(id: string, data: Partial<Omit<ExerciseBase, 'id'>>): Promise<ExerciseBase> {
   return apiRequest<ExerciseBase>(`/exercise-base/update/${id}`, {
     method: 'PUT',

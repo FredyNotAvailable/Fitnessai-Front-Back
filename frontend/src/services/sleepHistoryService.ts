@@ -24,6 +24,13 @@ export async function getSleepHistoriesByUser(userId: string): Promise<SleepHist
   });
 }
 
+export async function getSleepHistoryByUserAndDate(userId: string, date: string): Promise<SleepHistory | null> {
+  return apiRequest<SleepHistory | null>(`${BASE_PATH}/user/${userId}/date/${date}`, {
+    method: 'GET',
+  });
+}
+
+
 export async function updateSleepHistory(id: string, data: Partial<Omit<SleepHistory, 'id'>>): Promise<SleepHistory> {
   return apiRequest<SleepHistory>(`${BASE_PATH}/update/${id}`, {
     method: 'PUT',

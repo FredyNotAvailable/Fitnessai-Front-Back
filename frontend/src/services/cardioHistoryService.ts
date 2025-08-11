@@ -24,6 +24,12 @@ export async function getCardioHistoriesByUser(userId: string): Promise<CardioHi
   });
 }
 
+export async function getCardioHistoryByUserAndDate(userId: string, date: string): Promise<CardioHistory | null> {
+  return apiRequest<CardioHistory | null>(`${BASE_PATH}/user/${userId}/date/${date}`, {
+    method: 'GET',
+  });
+}
+
 export async function updateCardioHistory(id: string, data: Partial<Omit<CardioHistory, 'id'>>): Promise<CardioHistory> {
   return apiRequest<CardioHistory>(`${BASE_PATH}/update/${id}`, {
     method: 'PUT',

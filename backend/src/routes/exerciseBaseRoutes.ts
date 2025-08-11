@@ -12,6 +12,9 @@ router.post('/create', validateFirebaseToken, exerciseController.createExercise)
 // router.get('/:id', exerciseController.getExercise);
 router.get('/:id', validateFirebaseToken, exerciseController.getExercise);
 
+// Todos
+router.get('/', validateFirebaseToken, exerciseController.getAllExercises);
+
 // Actualizar ejercicio por ID
 router.put('/update/:id', validateFirebaseToken, exerciseController.updateExercise);
 

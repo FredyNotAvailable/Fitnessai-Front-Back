@@ -14,6 +14,9 @@ router.get('/:id', validateFirebaseToken, waterHistoryController.getWaterHistory
 // Obtener todos los historiales de agua de un usuario
 router.get('/user/:userId', validateFirebaseToken, waterHistoryController.getWaterHistoriesByUser);
 
+//
+router.get('/user/:userId/date/:date', validateFirebaseToken, waterHistoryController.getWaterHistoryByUserAndDate);
+
 // Actualizar historial de agua por ID
 router.put('/update/:id', validateFirebaseToken, waterHistoryController.updateWaterHistory);
 

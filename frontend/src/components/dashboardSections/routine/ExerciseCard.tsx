@@ -1,8 +1,23 @@
-// src/components/routine/ExerciseCard.tsx
-
 import { Box, Image, Text, VStack, HStack, useTheme, Spinner } from "@chakra-ui/react";
 import type { Exercise } from "../../../models/RoutineDay";
 import { useExerciseBase } from "../../../hooks/useExerciseBase";
+
+// Diccionario básico para traducción
+function traducirTexto(text: string) {
+  const diccionario: Record<string, string> = {
+    "Chest": "Pecho",
+    "Back": "Espalda",
+    "Legs": "Piernas",
+    "Shoulders": "Hombros",
+    "Biceps": "Bíceps",
+    "Triceps": "Tríceps",
+    "Cardio": "Cardio",
+    "Strength": "Fuerza",
+    // Puedes agregar más traducciones específicas de ejercicios aquí
+  };
+
+  return diccionario[text] || text;
+}
 
 type Props = {
   exercise: Exercise;
@@ -52,6 +67,12 @@ export function ExerciseCard({ exercise }: Props) {
     );
   }
 
+  // Traduce nombre y descripción antes de mostrar
+  const nombreTraducido = traducirTexto(exerciseBase.name);
+  const descripcionTraducida = exerciseBase.description
+    ? traducirTexto(exerciseBase.description)
+    : "";
+
   return (
     <Box
       w="100%"
@@ -68,7 +89,7 @@ export function ExerciseCard({ exercise }: Props) {
       {/* Foto */}
       <Image
         src={exerciseBase.photoUrl}
-        alt={exerciseBase.name}
+        alt={nombreTraducido}
         boxSize="120px"
         objectFit="cover"
         borderRadius="md"
@@ -78,12 +99,12 @@ export function ExerciseCard({ exercise }: Props) {
       {/* Contenido */}
       <VStack align="start" spacing={2} flex="1" overflow="hidden">
         <Text fontWeight="bold" fontSize="lg" noOfLines={1}>
-          {exerciseBase.name}
+          {nombreTraducido}
         </Text>
 
         <HStack spacing={6}>
-          <Text fontSize="sm">Sets: {exercise.sets}</Text>
-          <Text fontSize="sm">Reps: {exercise.reps}</Text>
+          <Text fontSize="sm">Series: {exercise.sets}</Text>
+          <Text fontSize="sm">Repeticiones: {exercise.reps}</Text>
           <Text fontSize="sm">Peso: {exercise.weight} kg</Text>
         </HStack>
 
@@ -93,10 +114,10 @@ export function ExerciseCard({ exercise }: Props) {
           noOfLines={4}
           overflowY="auto"
           sx={{
-            maxHeight: '4.5em',
+            maxHeight: "4.5em",
           }}
         >
-          {exerciseBase.description}
+          {descripcionTraducida}
         </Text>
       </VStack>
     </Box>

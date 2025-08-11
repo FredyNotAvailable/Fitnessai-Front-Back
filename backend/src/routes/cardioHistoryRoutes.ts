@@ -13,6 +13,9 @@ router.get('/:id', validateFirebaseToken, cardioHistoryController.getCardioHisto
 // Obtener todos los historiales de cardio de un usuario
 router.get('/user/:userId', validateFirebaseToken, cardioHistoryController.getCardioHistoriesByUser);
 
+//
+router.get('/user/:userId/date/:date', validateFirebaseToken, cardioHistoryController.getCardioHistoryByUserAndDate);
+
 // Actualizar historial de cardio por ID
 router.put('/update/:id', validateFirebaseToken, cardioHistoryController.updateCardioHistory);
 

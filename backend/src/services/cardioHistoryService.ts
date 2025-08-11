@@ -1,22 +1,24 @@
 // src/services/cardioHistoryService.ts
 
 import { db } from '../config/firebase';
-import { CardioHistory } from '../models/CardioHistory';
+import { CardioHistory, Category } from '../models/CardioHistory';
 
 const CARDIO_HISTORY_COLLECTION = 'cardioHistories';
 
-// Filtra solo las claves válidas para CardioHistory, excluyendo 'id'
+// Claves válidas para CardioHistory, excluyendo 'id'
+const allowedKeys: (keyof CardioHistory)[] = [
+  'userId',
+  'date',
+  'category',
+  'duration',
+  'distance',
+  'notes',
+];
+
+// Filtra solo las claves válidas (incluye category ahora)
 function sanitizeCardioHistoryData(
   data: Partial<CardioHistory>
 ): Omit<Partial<CardioHistory>, 'id'> {
-  const allowedKeys = Object.keys({
-    userId: '',
-    date: '',
-    duration: 0,
-    distance: 0,
-    notes: '',
-  }) as (keyof CardioHistory)[];
-
   return Object.fromEntries(
     Object.entries(data).filter(([key]) =>
       allowedKeys.includes(key as keyof CardioHistory)
@@ -24,10 +26,31 @@ function sanitizeCardioHistoryData(
   ) as Omit<Partial<CardioHistory>, 'id'>;
 }
 
-// Crear registro de historial de cardio
+// Crear registro de historial de cardio (evita duplicados por userId y date)
 export async function createCardioHistory(
   data: Omit<CardioHistory, 'id'>
 ): Promise<CardioHistory> {
+  const targetDate = data.date;
+
+  const querySnapshot = await db.collection(CARDIO_HISTORY_COLLECTION)
+    .where('userId', '==', data.userId)
+    .where('date', '==', targetDate)
+    .limit(1)
+    .get();
+
+  if (!querySnapshot.empty) {
+    // Ya existe historial para ese día, actualiza el registro
+    const doc = querySnapshot.docs[0];
+    const updatedData = sanitizeCardioHistoryData(data);
+    if (!updatedData.notes) {
+      updatedData.notes = '';
+    }
+
+    await doc.ref.update(updatedData);
+    return { id: doc.id, ...updatedData } as CardioHistory;
+  }
+
+  // No existe, crea nuevo documento
   const cardioRef = db.collection(CARDIO_HISTORY_COLLECTION).doc();
   const cardioData = sanitizeCardioHistoryData(data);
   if (!cardioData.notes) {
@@ -65,6 +88,31 @@ export async function getCardioHistoriesByUser(
 
   return histories;
 }
+
+///
+
+// Obtener historial de cardio por userId y date exacto
+export async function getCardioHistoryByUserAndDate(
+  userId: string,
+  date: string
+): Promise<CardioHistory | null> {
+  const querySnapshot = await db
+    .collection(CARDIO_HISTORY_COLLECTION)
+    .where('userId', '==', userId)
+    .where('date', '==', date)
+    .limit(1)
+    .get();
+
+  if (querySnapshot.empty) return null;
+
+  const doc = querySnapshot.docs[0];
+  const data = doc.data()!;
+  return { id: doc.id, ...data } as CardioHistory;
+}
+
+
+///
+
 
 // Actualizar historial de cardio
 export async function updateCardioHistory(

@@ -37,6 +37,30 @@ export async function getWaterHistoriesByUser(req: Request, res: Response) {
   }
 }
 
+
+export async function getWaterHistoryByUserAndDate(req: Request, res: Response) {
+  try {
+    const { userId, date } = req.params; // <-- aquí
+
+    if (typeof userId !== 'string' || typeof date !== 'string') {
+      return res.status(400).json({ error: 'userId y date son requeridos y deben ser strings' });
+    }
+
+    const history = await waterHistoryService.getWaterHistoryByUserAndDate(userId, date);
+
+    if (!history) {
+      return res.status(404).json({ error: 'No existe historial, para ese usuario y fecha' });
+    }
+
+    return res.json(history);
+  } catch (error) {
+    console.error('Error getting water history by userId and date:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+
+
 export async function updateWaterHistory(req: Request, res: Response) {
   try {
     const { id } = req.params;

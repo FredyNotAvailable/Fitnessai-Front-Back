@@ -1,37 +1,55 @@
-// src/hooks/useWaterHistory.ts
-
 import { useState, useEffect, useCallback } from 'react';
 import type { WaterHistory } from '../models/WaterHistory';
 import {
   createWaterHistory,
   getWaterHistory,
+  getWaterHistoryByUserAndDate,
   getWaterHistoriesByUser,
   updateWaterHistory,
   deleteWaterHistory,
 } from '../services/waterHistoryService';
 
-export function useWaterHistory(id?: string) {
+export function useWaterHistory(id?: string, userId?: string, date?: string) {
   const [waterHistory, setWaterHistory] = useState<WaterHistory | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!id) {
-      setWaterHistory(null);
+    if (id) {
+      setLoading(true);
+      getWaterHistory(id)
+        .then(data => {
+          setWaterHistory(data);
+          setError(null);
+        })
+        .catch(err => {
+          setError(err.message || 'Error al obtener historial de agua');
+          setWaterHistory(null);
+        })
+        .finally(() => setLoading(false));
       return;
     }
-    setLoading(true);
-    getWaterHistory(id)
-      .then(data => {
-        setWaterHistory(data);
-        setError(null);
-      })
-      .catch(err => {
-        setError(err.message || 'Error al obtener historial de agua');
-        setWaterHistory(null);
-      })
-      .finally(() => setLoading(false));
-  }, [id]);
+
+    if (userId && date) {
+      setLoading(true);
+      getWaterHistoryByUserAndDate(userId, date)
+        .then(data => {
+          setWaterHistory(data);
+          setError(null);
+        })
+        .catch(err => {
+          setError(err.message || 'Error al obtener historial de agua');
+          setWaterHistory(null);
+        })
+        .finally(() => setLoading(false));
+      return;
+    }
+
+    // Si no hay id ni userId+date, limpia estados
+    setWaterHistory(null);
+    setError(null);
+    setLoading(false);
+  }, [id, userId, date]);
 
   const create = useCallback(async (data: Omit<WaterHistory, 'id'>) => {
     setLoading(true);
@@ -50,9 +68,7 @@ export function useWaterHistory(id?: string) {
 
   const update = useCallback(
     async (data: Partial<Omit<WaterHistory, 'id'>>) => {
-      if (!waterHistory?.id) {
-        throw new Error('No hay historial de agua cargado para actualizar');
-      }
+      if (!waterHistory?.id) throw new Error('No hay historial de agua cargado para actualizar');
       setLoading(true);
       try {
         const updated = await updateWaterHistory(waterHistory.id, data);
@@ -70,9 +86,7 @@ export function useWaterHistory(id?: string) {
   );
 
   const remove = useCallback(async () => {
-    if (!waterHistory?.id) {
-      throw new Error('No hay historial de agua cargado para eliminar');
-    }
+    if (!waterHistory?.id) throw new Error('No hay historial de agua cargado para eliminar');
     setLoading(true);
     try {
       await deleteWaterHistory(waterHistory.id);
@@ -104,6 +118,8 @@ export function useWaterHistoriesByUser(userId?: string) {
   useEffect(() => {
     if (!userId) {
       setHistories([]);
+      setError(null);
+      setLoading(false);
       return;
     }
     setLoading(true);

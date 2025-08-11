@@ -6,14 +6,15 @@ import {
   getExerciseBase,
   updateExerciseBase,
   deleteExerciseBase,
+  getAllExerciseBases, // <-- importa esta función nueva
 } from '../services/exerciseBaseService';
 
+// Hook para un ejercicio base individual por id
 export function useExerciseBase(id?: string) {
   const [exerciseBase, setExerciseBase] = useState<ExerciseBase | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar ejercicio base si se proporciona un id
   useEffect(() => {
     if (!id) {
       setExerciseBase(null);
@@ -32,7 +33,6 @@ export function useExerciseBase(id?: string) {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Crear ejercicio base
   const create = useCallback(async (data: Omit<ExerciseBase, 'id'>) => {
     setLoading(true);
     try {
@@ -48,7 +48,6 @@ export function useExerciseBase(id?: string) {
     }
   }, []);
 
-  // Actualizar ejercicio base
   const update = useCallback(
     async (data: Partial<Omit<ExerciseBase, 'id'>>) => {
       if (!exerciseBase?.id) {
@@ -70,7 +69,6 @@ export function useExerciseBase(id?: string) {
     [exerciseBase?.id]
   );
 
-  // Eliminar ejercicio base
   const remove = useCallback(async () => {
     if (!exerciseBase?.id) {
       throw new Error('No hay ejercicio base cargado para eliminar');
@@ -96,4 +94,27 @@ export function useExerciseBase(id?: string) {
     update,
     remove,
   };
+}
+
+// Nuevo hook para obtener todos los ejercicios base
+export function useExerciseBases() {
+  const [exerciseBases, setExerciseBases] = useState<ExerciseBase[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    getAllExerciseBases()
+      .then((data) => {
+        setExerciseBases(data);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err.message || 'Error al obtener los ejercicios base');
+        setExerciseBases([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { exerciseBases, loading, error };
 }

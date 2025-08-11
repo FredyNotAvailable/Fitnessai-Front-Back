@@ -24,9 +24,31 @@ function sanitizeWeightHistoryData(
 }
 
 // Crear registro de historial de peso
+// Crear registro de historial de peso (evita duplicados por userId y date)
 export async function createWeightHistory(
   data: Omit<WeightHistory, 'id'>
 ): Promise<WeightHistory> {
+  const targetDate = data.date;
+
+  const querySnapshot = await db.collection(WEIGHT_HISTORY_COLLECTION)
+    .where('userId', '==', data.userId)
+    .where('date', '==', targetDate)
+    .limit(1)
+    .get();
+
+  if (!querySnapshot.empty) {
+    // Ya existe historial para ese día, actualiza el registro
+    const doc = querySnapshot.docs[0];
+    const updatedData = sanitizeWeightHistoryData(data);
+    if (!updatedData.notes) {
+      updatedData.notes = '';
+    }
+
+    await doc.ref.update(updatedData);
+    return { id: doc.id, ...updatedData } as WeightHistory;
+  }
+
+  // No existe, crea nuevo documento
   const weightRef = db.collection(WEIGHT_HISTORY_COLLECTION).doc();
   const weightData = sanitizeWeightHistoryData(data);
   if (!weightData.notes) {
@@ -35,6 +57,7 @@ export async function createWeightHistory(
   await weightRef.set(weightData);
   return { id: weightRef.id, ...weightData } as WeightHistory;
 }
+
 
 // Obtener historial de peso por ID
 export async function getWeightHistory(

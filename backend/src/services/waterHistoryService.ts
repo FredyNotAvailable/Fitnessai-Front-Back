@@ -8,31 +8,39 @@ const WATER_HISTORY_COLLECTION = 'waterHistories';
 // Filtra solo las claves válidas para WaterHistory, excluyendo 'id'
 function sanitizeWaterHistoryData(
   data: Partial<WaterHistory>
-): Omit<Partial<WaterHistory>, 'id'> {
-  const allowedKeys = Object.keys({
-    userId: '',
-    date: '',
-    liters: 0,
-    notes: '',
-  }) as (keyof WaterHistory)[];
+): Partial<Omit<WaterHistory, 'id'>> {
+  const allowedKeys = ['userId', 'date', 'liters', 'notes'] as const;
+  const sanitized = Object.fromEntries(
+    Object.entries(data).filter(([key]) => allowedKeys.includes(key as any))
+  ) as Partial<Omit<WaterHistory, 'id'>>;
 
-  return Object.fromEntries(
-    Object.entries(data).filter(([key]) =>
-      allowedKeys.includes(key as keyof WaterHistory)
-    )
-  ) as Omit<Partial<WaterHistory>, 'id'>;
+  if (sanitized.notes === undefined) sanitized.notes = '';
+  return sanitized;
 }
 
 // Crear registro de historial de agua
-export async function createWaterHistory(
-  data: Omit<WaterHistory, 'id'>
-): Promise<WaterHistory> {
+export async function createWaterHistory(data: Omit<WaterHistory, 'id'>): Promise<WaterHistory> {
+  const targetDate = data.date;
+
+  const querySnapshot = await db.collection(WATER_HISTORY_COLLECTION)
+    .where('userId', '==', data.userId)
+    .where('date', '==', targetDate)
+    .limit(1)
+    .get();
+
+  if (!querySnapshot.empty) {
+    // Si ya existe, actualiza el documento existente
+    const doc = querySnapshot.docs[0];
+    const updatedData = sanitizeWaterHistoryData(data);
+
+    await doc.ref.update(updatedData);
+    return { id: doc.id, ...updatedData } as WaterHistory;
+  }
+
+  // Si no existe, crea uno nuevo
   const waterRef = db.collection(WATER_HISTORY_COLLECTION).doc();
   const waterData = sanitizeWaterHistoryData(data);
-  // Aseguramos que notes esté definido (aunque sea '')
-  if (!waterData.notes) {
-    waterData.notes = '';
-  }
+
   await waterRef.set(waterData);
   return { id: waterRef.id, ...waterData } as WaterHistory;
 }
@@ -66,6 +74,27 @@ export async function getWaterHistoriesByUser(
   return histories;
 }
 
+// Obtener historial de agua de un usuario en una fecha específica (YYYY-MM-DD)
+export async function getWaterHistoryByUserAndDate(
+  userId: string,
+  date: string
+): Promise<WaterHistory | null> {
+  const querySnapshot = await db
+    .collection(WATER_HISTORY_COLLECTION)
+    .where('userId', '==', userId)
+    .where('date', '==', date)
+    .limit(1)
+    .get();
+
+  if (querySnapshot.empty) {
+    return null;
+  }
+
+  const doc = querySnapshot.docs[0];
+  const data = doc.data()!;
+  return { id: doc.id, ...data } as WaterHistory;
+}
+
 // Actualizar historial de agua
 export async function updateWaterHistory(
   id: string,
@@ -76,10 +105,6 @@ export async function updateWaterHistory(
   if (!doc.exists) return null;
 
   const waterData = sanitizeWaterHistoryData(data);
-  // Aseguramos que notes esté definido (aunque sea '')
-  if (waterData.notes === undefined) {
-    waterData.notes = '';
-  }
   await waterRef.update(waterData);
 
   const updatedDoc = await waterRef.get();

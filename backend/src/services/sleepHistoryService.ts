@@ -1,11 +1,9 @@
-// src/services/sleepHistoryService.ts
-
 import { db } from '../config/firebase';
-import { SleepHistory } from '../models/SleepHistory';
+import { SleepHistory, SleepQuality } from '../models/SleepHistory';
 
 const SLEEP_HISTORY_COLLECTION = 'sleepHistories';
 
-// Filtra solo las claves válidas para SleepHistory, excluyendo 'id'
+// Claves válidas para SleepHistory excepto 'id'
 function sanitizeSleepHistoryData(
   data: Partial<SleepHistory>
 ): Omit<Partial<SleepHistory>, 'id'> {
@@ -13,7 +11,7 @@ function sanitizeSleepHistoryData(
     userId: '',
     date: '',
     duration: 0,
-    quality: 0,
+    quality: 'poor' as SleepQuality, // tipo string union
     notes: '',
   }) as (keyof SleepHistory)[];
 
@@ -28,6 +26,27 @@ function sanitizeSleepHistoryData(
 export async function createSleepHistory(
   data: Omit<SleepHistory, 'id'>
 ): Promise<SleepHistory> {
+  const targetDate = data.date;
+
+  const querySnapshot = await db.collection(SLEEP_HISTORY_COLLECTION)
+    .where('userId', '==', data.userId)
+    .where('date', '==', targetDate)
+    .limit(1)
+    .get();
+
+  if (!querySnapshot.empty) {
+    // Ya existe historial para ese día, actualiza el registro
+    const doc = querySnapshot.docs[0];
+    const updatedData = sanitizeSleepHistoryData(data);
+    if (!updatedData.notes) {
+      updatedData.notes = '';
+    }
+
+    await doc.ref.update(updatedData);
+    return { id: doc.id, ...updatedData } as SleepHistory;
+  }
+
+  // No existe, crea nuevo documento
   const sleepRef = db.collection(SLEEP_HISTORY_COLLECTION).doc();
   const sleepData = sanitizeSleepHistoryData(data);
   if (!sleepData.notes) {
@@ -36,6 +55,7 @@ export async function createSleepHistory(
   await sleepRef.set(sleepData);
   return { id: sleepRef.id, ...sleepData } as SleepHistory;
 }
+
 
 // Obtener historial de sueño por ID
 export async function getSleepHistory(
@@ -64,6 +84,25 @@ export async function getSleepHistoriesByUser(
   });
 
   return histories;
+}
+
+// Obtener historial de sueño por userId y date exacto
+export async function getSleepHistoryByUserAndDate(
+  userId: string,
+  date: string
+): Promise<SleepHistory | null> {
+  const querySnapshot = await db
+    .collection(SLEEP_HISTORY_COLLECTION)
+    .where('userId', '==', userId)
+    .where('date', '==', date)
+    .limit(1)
+    .get();
+
+  if (querySnapshot.empty) return null;
+
+  const doc = querySnapshot.docs[0];
+  const data = doc.data()!;
+  return { id: doc.id, ...data } as SleepHistory;
 }
 
 // Actualizar historial de sueño

@@ -24,6 +24,12 @@ export async function getExerciseHistoriesByUser(userId: string): Promise<Exerci
   });
 }
 
+export async function getExerciseHistoriesByUserAndDate(userId: string, date: string): Promise<ExerciseHistory[] | null> {
+  return apiRequest<ExerciseHistory[] | null>(`${BASE_PATH}/user/${userId}/date/${date}`, {
+    method: 'GET',
+  });
+}
+
 export async function updateExerciseHistory(id: string, data: Partial<Omit<ExerciseHistory, 'id'>>): Promise<ExerciseHistory> {
   return apiRequest<ExerciseHistory>(`${BASE_PATH}/update/${id}`, {
     method: 'PUT',

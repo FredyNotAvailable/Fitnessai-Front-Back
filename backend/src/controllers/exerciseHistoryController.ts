@@ -37,6 +37,21 @@ export async function getExerciseHistoriesByUser(req: Request, res: Response) {
   }
 }
 
+export async function getExerciseHistoriesByUserAndDate(req: Request, res: Response) {
+  try {
+    const { userId, date } = req.params;
+    if (!userId || !date) {
+      return res.status(400).json({ error: 'userId and date parameters are required' });
+    }
+
+    const histories = await exerciseHistoryService.getExerciseHistoriesByUserAndDate(userId, date);
+    return res.json(histories);
+  } catch (error) {
+    console.error('Error getting exercise histories by userId and date:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 export async function updateExerciseHistory(req: Request, res: Response) {
   try {
     const { id } = req.params;

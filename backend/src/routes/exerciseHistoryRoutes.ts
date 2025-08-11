@@ -14,6 +14,9 @@ router.get('/:id', validateFirebaseToken, exerciseHistoryController.getExerciseH
 // Obtener todo el historial de un usuario
 router.get('/user/:userId', validateFirebaseToken, exerciseHistoryController.getExerciseHistoriesByUser);
 
+// Obtener historial de un usuario por fecha
+router.get('/user/:userId/date/:date', validateFirebaseToken, exerciseHistoryController.getExerciseHistoriesByUserAndDate);
+
 // Actualizar historial de ejercicio por ID
 router.put('/update/:id', validateFirebaseToken, exerciseHistoryController.updateExerciseHistory);
 

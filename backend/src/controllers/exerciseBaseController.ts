@@ -35,6 +35,18 @@ export async function getExercise(req: Request, res: Response) {
   }
 }
 
+// Obtener todos los ejercicios
+export async function getAllExercises(req: Request, res: Response) {
+  try {
+    const exercises = await exerciseService.getAllExercises();
+    return res.json(exercises);
+  } catch (error) {
+    console.error('Error al obtener ejercicios:', error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
+  }
+}
+
+
 // Actualizar ejercicio parcialmente
 export async function updateExercise(req: Request, res: Response) {
   try {

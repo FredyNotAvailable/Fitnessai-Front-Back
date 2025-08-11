@@ -13,6 +13,9 @@ router.get('/:id', validateFirebaseToken, sleepHistoryController.getSleepHistory
 // Obtener todos los historiales de sueño de un usuario
 router.get('/user/:userId', validateFirebaseToken, sleepHistoryController.getSleepHistoriesByUser);
 
+//
+router.get('/user/:userId/date/:date', validateFirebaseToken, sleepHistoryController.getSleepHistoryByUserAndDate);
+
 // Actualizar historial de sueño por ID
 router.put('/update/:id', validateFirebaseToken, sleepHistoryController.updateSleepHistory);
 

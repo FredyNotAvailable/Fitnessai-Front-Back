@@ -1,12 +1,11 @@
 import { Flex, Box } from '@chakra-ui/react';
 // import { Profile } from '../components/dashboardSections/Profile';
-import { Progress } from '../components/dashboardSections/Progress';
 import { Routine } from '../components/dashboardSections/routine/Routine';
-import { Habits } from '../components/dashboardSections/Habits';
-import { WeeklyExerciseTracker } from '../components/dashboardSections/WeeklyExerciseTracker';
-import { DailyTrainingStatsCard } from '../components/dashboardSections/TrainingStatsCard';
-import { TrainingSummaryCard } from '../components/dashboardSections/TrainingSummaryCard';
-import { WeeklyRoutineGenerator } from '../components/testing/WeeklyRoutineGenerator';
+import { Habits } from '../components/dashboardSections/Habits/Habits';
+// import { WeeklyExerciseTracker } from '../components/dashboardSections/WeeklyExerciseTracker';
+// import { TrainingSummaryCard } from '../components/dashboardSections/TrainingSummaryCard';
+import { ExerciseLogDay } from '../components/dashboardSections/RegisterExercisesDay/ExerciseLogDay';
+import { Progress } from '../components/dashboardSections/Progress/Progress';
 
 const Dashboard = () => {
   return (
@@ -29,17 +28,13 @@ const Dashboard = () => {
         gap={6}
       >
         {/* <Box>
-          <WeeklyRoutineGenerator />
-        </Box> */}
-        
-        <Box>
           <WeeklyExerciseTracker />
-        </Box>
+        </Box> */}
         <Box>
           <Habits />
         </Box>
         <Box>
-          <DailyTrainingStatsCard />
+          <ExerciseLogDay />
         </Box>
 
       </Flex>
@@ -62,9 +57,9 @@ const Dashboard = () => {
         <Box>
           <Progress />
         </Box>
-        <Box>
+        {/* <Box>
           <TrainingSummaryCard />
-        </Box>
+        </Box> */}
       </Flex>
     </Flex>
   );
