@@ -1,6 +1,6 @@
 import { Box, Heading, Text, useTheme } from "@chakra-ui/react";
 import { UserStatsCard } from "./UserStatsCard";
-import { MotivationalMessageCard } from "./MotivationalMessageCard";
+import { GenerateReport } from "./GenerateReport";
 
 export function Progress() {
   const theme = useTheme();
@@ -18,10 +18,11 @@ export function Progress() {
       borderWidth="1px"
       borderColor={theme.colors.gray[200]}
       position="relative"
-      overflow="hidden"
+      overflow="auto"  // <--- Scroll para todo el contenido
       minH="200px"
       display="flex"
       flexDirection="column"
+      gap={4}
     >
       <Heading size="lg" mb={2} color="primary.900" textAlign="center">
         Estadísticas del Usuario
@@ -39,15 +40,9 @@ export function Progress() {
         incluyendo progreso, hábitos y rendimiento.
       </Text>
 
-      <Box flex="1" display="flex" flexDirection="column" gap={4}>
-        {/* Ajustamos flex para controlar espacio */}
-        <Box flex={3} overflow="hidden">
-          <UserStatsCard />
-        </Box>
-        <Box flex={1} overflow="hidden">
-          <MotivationalMessageCard />
-        </Box>
-      </Box>
+      <UserStatsCard />
+
+      <GenerateReport />
     </Box>
   );
 }

@@ -1,0 +1,113 @@
+pero  has de todos los modelso que tengo
+
+// src/models/Profile.ts
+
+export enum Gender { Male = 'male', Female = 'female', Other = 'other', Unknown = '' }
+
+export enum Goal { LoseWeight = 'lose weight', GainMuscle = 'gain muscle', Maintain = 'maintain', Unknown = '' }
+
+export enum ExperienceLevel { Beginner = 'beginner', Intermediate = 'intermediate', Advanced = 'advanced', Unknown = '' }
+
+export enum WeekDay { Monday = 'Monday', Tuesday = 'Tuesday', Wednesday = 'Wednesday', Thursday = 'Thursday', Friday = 'Friday', Saturday = 'Saturday', Sunday = 'Sunday' }
+
+export interface Profile {
+  userId: string;
+  gender: Gender;               // Genero
+  trainingDays: string[];       // Ejemplo: [WeekDay.Monday, WeekDay.Wednesday]
+  weight: number;               // en kg
+  height: number;               // en cm
+  birthdate: string;            // ISO date string
+  goal: Goal;                   // Objetivo
+  experience: ExperienceLevel;  // Experiencia
+}
+
+// src/models/CardioHistory.ts
+
+// Enum for cardio categories/types
+export enum Category {
+  Run = 'run',          // Running
+  Walk = 'walk',        // Walking
+  Bike = 'bike',        // Biking (si quieres agregar más tipos)
+}
+
+// Interface for cardio history record
+export interface CardioHistory {
+  id: string;         // Unique ID
+  userId: string;     // User ID
+  date: string;       // ISO date string, e.g., '2025-08-10'
+  category: Category; // Type of cardio (run, walk, etc.)
+  duration: number;   // Duration in minutes
+  distance: number;   // Distance covered (km, meters, etc.)
+  notes?: string;     // Optional notes
+}
+
+// src/models/ExerciseHistory.ts
+
+export interface ExerciseHistory {
+  id: string;
+  userId: string;
+  exerciseBaseId: string;
+  date: string;             // ISO date string
+  sets: number;
+  reps: number;
+  weight: number;
+  notes?: string;
+}
+
+// src/RoutineDay.ts
+
+import { Category } from "./ExerciseBase";
+
+export interface Exercise {
+  exerciseBaseId: string;
+  sets: number;
+  reps: number;
+  weight: number;
+}
+
+export interface RoutineDay {
+  id: string;
+  userId: string;
+  day: string;
+  categories: Category[];
+  exercises: Exercise[];
+  duration: number;
+  notes: string;
+}
+
+// src/models/SleepHistory.ts
+
+export enum SleepQuality {
+  Poor = 'poor',
+  Fair = 'fair',
+  Good = 'good',
+}
+
+export interface SleepHistory {
+  id: string;
+  userId: string;
+  date: string;
+  duration: number;
+  quality: SleepQuality;
+  notes: string;
+}
+
+// src/models/WaterHistory.ts
+
+export interface WaterHistory {
+  id: string;
+  userId: string;
+  date: string;       // ISO date string
+  liters: number;
+  notes: string;
+}
+
+// src/models/WeightHistory.ts
+
+export interface WeightHistory {
+  id: string;
+  userId: string;
+  date: string;   // ISO date string
+  weight: number; // peso en la unidad que uses (kg, lbs, etc.)
+  notes: string;  // obligatorio, aunque pueda ser cadena vacía
+}

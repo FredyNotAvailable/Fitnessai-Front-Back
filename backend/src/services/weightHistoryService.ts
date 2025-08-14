@@ -25,6 +25,42 @@ function sanitizeWeightHistoryData(
 
 // Crear registro de historial de peso
 // Crear registro de historial de peso (evita duplicados por userId y date)
+// export async function createWeightHistory(
+//   data: Omit<WeightHistory, 'id'>
+// ): Promise<WeightHistory> {
+//   const targetDate = data.date;
+
+//   const querySnapshot = await db.collection(WEIGHT_HISTORY_COLLECTION)
+//     .where('userId', '==', data.userId)
+//     .where('date', '==', targetDate)
+//     .limit(1)
+//     .get();
+
+//   if (!querySnapshot.empty) {
+//     // Ya existe historial para ese día, actualiza el registro
+//     const doc = querySnapshot.docs[0];
+//     const updatedData = sanitizeWeightHistoryData(data);
+//     if (!updatedData.notes) {
+//       updatedData.notes = '';
+//     }
+
+//     await doc.ref.update(updatedData);
+//     return { id: doc.id, ...updatedData } as WeightHistory;
+//   }
+
+//   // No existe, crea nuevo documento
+//   const weightRef = db.collection(WEIGHT_HISTORY_COLLECTION).doc();
+//   const weightData = sanitizeWeightHistoryData(data);
+//   if (!weightData.notes) {
+//     weightData.notes = '';
+//   }
+//   await weightRef.set(weightData);
+//   return { id: weightRef.id, ...weightData } as WeightHistory;
+// }
+
+
+import { updateProfileWeight } from './profileService'; // importa la función
+
 export async function createWeightHistory(
   data: Omit<WeightHistory, 'id'>
 ): Promise<WeightHistory> {
@@ -36,26 +72,33 @@ export async function createWeightHistory(
     .limit(1)
     .get();
 
+  let result: WeightHistory;
+
   if (!querySnapshot.empty) {
     // Ya existe historial para ese día, actualiza el registro
     const doc = querySnapshot.docs[0];
     const updatedData = sanitizeWeightHistoryData(data);
-    if (!updatedData.notes) {
-      updatedData.notes = '';
-    }
+    if (!updatedData.notes) updatedData.notes = '';
 
     await doc.ref.update(updatedData);
-    return { id: doc.id, ...updatedData } as WeightHistory;
+    result = { id: doc.id, ...updatedData } as WeightHistory;
+  } else {
+    // No existe, crea nuevo documento
+    const weightRef = db.collection(WEIGHT_HISTORY_COLLECTION).doc();
+    const weightData = sanitizeWeightHistoryData(data);
+    if (!weightData.notes) weightData.notes = '';
+    await weightRef.set(weightData);
+    result = { id: weightRef.id, ...weightData } as WeightHistory;
   }
 
-  // No existe, crea nuevo documento
-  const weightRef = db.collection(WEIGHT_HISTORY_COLLECTION).doc();
-  const weightData = sanitizeWeightHistoryData(data);
-  if (!weightData.notes) {
-    weightData.notes = '';
+  // 2️⃣ Actualizar peso en el perfil del usuario
+  try {
+    await updateProfileWeight(data.userId, data.weight);
+  } catch (err) {
+    console.error('Error actualizando peso en perfil:', err);
   }
-  await weightRef.set(weightData);
-  return { id: weightRef.id, ...weightData } as WeightHistory;
+
+  return result;
 }
 
 

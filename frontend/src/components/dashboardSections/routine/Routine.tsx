@@ -154,13 +154,7 @@ export function Routine() {
 
           {routineForDay?.duration && (
             <Text fontSize="sm" color={theme.colors.gray[700]} mb={2}>
-              Duración: {routineForDay.duration} min
-            </Text>
-          )}
-
-          {routineForDay?.notes && (
-            <Text fontSize="sm" color={theme.colors.gray[700]} fontStyle="italic">
-              Notas: {routineForDay.notes}
+              Duración por rutina: {routineForDay.duration} min
             </Text>
           )}
         </Box>

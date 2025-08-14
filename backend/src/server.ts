@@ -13,6 +13,7 @@ import cardioHistoryRoutes from './routes/cardioHistoryRoutes';
 import sleepHistoryRoutes from './routes/sleepHistoryRoutes';
 import weightHistoryRoutes from './routes/weightHistoryRoutes';
 import trainingLogRoutes from './routes/trainingLogRoutes';
+import userReportRoutes from './routes/userReportRoutes';
 
 const app = express();
 
@@ -52,6 +53,8 @@ app.use('/api/sleep-history', sleepHistoryRoutes);
 app.use('/api/weight-history', weightHistoryRoutes);
 // Rutas para historial de entrenamiento
 app.use('/api/training-log', trainingLogRoutes);
+// Reporte
+app.use('/api/report', userReportRoutes);
 
 // Ruta pública
 app.get('/', (_req: Request, res: Response) => {

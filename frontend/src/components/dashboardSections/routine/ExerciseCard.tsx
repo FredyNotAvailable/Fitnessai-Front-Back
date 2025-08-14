@@ -1,6 +1,7 @@
 import { Box, Image, Text, VStack, HStack, useTheme, Spinner } from "@chakra-ui/react";
 import type { Exercise } from "../../../models/RoutineDay";
 import { useExerciseBase } from "../../../hooks/useExerciseBase";
+import { MdFitnessCenter } from "react-icons/md";
 
 // Diccionario básico para traducción
 function traducirTexto(text: string) {
@@ -88,7 +89,8 @@ export function ExerciseCard({ exercise }: Props) {
     >
       {/* Foto */}
       <Image
-        src={exerciseBase.photoUrl}
+        src={"https://i.pinimg.com/736x/18/67/23/18672311e25fb09ff6e48f78fcc7a6ad.jpg"}
+        // src={exerciseBase.photoUrl}
         alt={nombreTraducido}
         boxSize="120px"
         objectFit="cover"

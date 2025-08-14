@@ -39,7 +39,14 @@ export function TrainingStats({ startDate, endDate }: StatsProps) {
     return acc;
   }, {});
 
-  const chartData: DataEntryMulti[] = Object.entries(grouped).map(([date, vals]) => ({
+  // const chartData: DataEntryMulti[] = Object.entries(grouped).map(([date, vals]) => ({
+  //   date,
+  //   sets: vals.sets,
+  //   reps: vals.reps,
+  //   weight: Number(vals.weight.toFixed(1)),
+  // }));
+
+    const chartData: DataEntryMulti[] = Object.entries(grouped).map(([date, vals]) => ({
     date,
     sets: vals.sets,
     reps: vals.reps,
@@ -48,21 +55,6 @@ export function TrainingStats({ startDate, endDate }: StatsProps) {
 
   return (
     <Box>
-      {/* Gráfico de líneas original (comentado) */}
-      {/*
-      <MultiLineChart
-        data={chartData}
-        title="Estadísticas de Entrenamiento"
-        yLabel="Cantidad"
-        height={320}
-        lines={[
-          { dataKey: "sets", color: "#3182ce", name: "Sets" },
-          { dataKey: "reps", color: "#38a169", name: "Reps" },
-          { dataKey: "weight", color: "#dd6b20", name: "Peso" },
-        ]}
-      />
-      */}
-
       {/* Nuevo gráfico de barras */}
       <BarStatsChart
         data={chartData}

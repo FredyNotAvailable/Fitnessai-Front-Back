@@ -120,10 +120,6 @@ export function useExerciseHistoryById(id?: string) {
 }
 
 // Hook para obtener todos los historiales de un usuario
-// src/hooks/useExerciseHistory.ts
-// ... importaciones y demás código sin cambios ...
-
-// Hook para obtener todos los historiales de un usuario con soporte para refrescar
 export function useExerciseHistoriesByUser(userId?: string, refreshFlag?: boolean) {
   const [histories, setHistories] = useState<ExerciseHistory[]>([]);
   const [loading, setLoading] = useState(false);
@@ -164,25 +160,52 @@ export function useExerciseHistoriesByUser(userId?: string, refreshFlag?: boolea
     return () => {
       isMounted = false;
     };
-  }, [userId, refreshFlag]); // <-- Aquí agregamos refreshFlag como dependencia
+  }, [userId, refreshFlag]);
 
   return { histories, loading, error };
 }
 
-
-// Hook para obtener historial único por userId y fecha, con crear y actualizar
-export function useExerciseHistoryByUserAndDate(userId?: string, date?: string) {
-  const [exerciseHistory, setExerciseHistory] = useState<ExerciseHistory | null>(null);
+// Hook para obtener todos los historiales de un usuario en una fecha específica
+// Hook para obtener todos los historiales de un usuario en una fecha específica
+export function useExerciseHistoriesByUserAndDate(
+  userId?: string,
+  date?: string,
+  refreshFlag?: boolean
+) {
+  const [histories, setHistories] = useState<ExerciseHistory[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Función para crear un nuevo historial
+  const create = useCallback(
+    async (payload: Omit<ExerciseHistory, 'id'>) => {
+      setLoading(true);
+      try {
+        const newHistory = await createExerciseHistory(payload);
+        setHistories((prev) => [...prev, newHistory]);
+        setError(null);
+        return newHistory;
+      } catch (err: unknown) {
+        const message =
+          err instanceof Error
+            ? err.message
+            : 'Error al crear historial de ejercicio';
+        setError(message);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     let isMounted = true;
 
-    async function fetchByUserAndDate() {
+    async function fetchHistories() {
       if (!userId || !date) {
         if (isMounted) {
-          setExerciseHistory(null);
+          setHistories([]);
           setError(null);
           setLoading(false);
         }
@@ -190,69 +213,31 @@ export function useExerciseHistoryByUserAndDate(userId?: string, date?: string) 
       }
       setLoading(true);
       try {
-      const data = await getExerciseHistoriesByUserAndDate(userId, date);
-      if (isMounted) {
-        setExerciseHistory(data && data.length > 0 ? data[0] : null);
-        setError(null);
-      }
+        const data = await getExerciseHistoriesByUserAndDate(userId, date);
+        if (isMounted) {
+          setHistories(data ?? []);
+          setError(null);
+        }
       } catch (err: unknown) {
         if (isMounted) {
-          const message = err instanceof Error ? err.message : 'Error al obtener historial de ejercicio por usuario y fecha';
+          const message =
+            err instanceof Error
+              ? err.message
+              : 'Error al obtener historiales de ejercicio por fecha';
           setError(message);
-          setExerciseHistory(null);
+          setHistories([]);
         }
       } finally {
         if (isMounted) setLoading(false);
       }
     }
 
-    fetchByUserAndDate();
+    fetchHistories();
 
     return () => {
       isMounted = false;
     };
-  }, [userId, date]);
+  }, [userId, date, refreshFlag]);
 
-  const create = useCallback(async (data: Omit<ExerciseHistory, 'id'>) => {
-    setLoading(true);
-    try {
-      const newHistory = await createExerciseHistory(data);
-      setExerciseHistory(newHistory);
-      setError(null);
-      return newHistory;
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al crear historial de ejercicio';
-      setError(message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const update = useCallback(async (data: Partial<Omit<ExerciseHistory, 'id'>>) => {
-    if (!exerciseHistory?.id) {
-      throw new Error('No hay historial cargado para actualizar');
-    }
-    setLoading(true);
-    try {
-      const updated = await updateExerciseHistory(exerciseHistory.id, data);
-      setExerciseHistory(updated);
-      setError(null);
-      return updated;
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al actualizar historial de ejercicio';
-      setError(message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [exerciseHistory?.id]);
-
-  return {
-    exerciseHistory,
-    loading,
-    error,
-    create,
-    update,
-  };
+  return { histories, loading, error, create };
 }

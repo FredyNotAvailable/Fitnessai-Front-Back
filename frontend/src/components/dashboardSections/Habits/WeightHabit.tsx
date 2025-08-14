@@ -1,10 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
+  VStack,
   Box,
   Icon,
-  CircularProgress,
-  Spinner,
-  useTheme,
   Text,
   Button,
   Modal,
@@ -20,42 +18,45 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FaWeight } from "react-icons/fa";
-import { useWeightHistory } from "../../../hooks/useWeightHistory"; // Solo para create()
+import { useWeightHistory, useWeightHistoriesByUser } from "../../../hooks/useWeightHistory";
 
 type WeightHabitProps = {
   userId: string;
   goalWeight?: number;
 };
 
-export function WeightHabit({ userId, goalWeight }: WeightHabitProps) {
-  const theme = useTheme();
+export function WeightHabit({ userId }: WeightHabitProps) {
   const toast = useToast();
   const today = new Date().toISOString().slice(0, 10);
 
-  // Solo obtenemos create desde el hook para crear nuevo registro
-  const { create, loading: loadingCreate, error: errorCreate } = useWeightHistory();
+  const { create, loading: isSaving, error: errorCreate } = useWeightHistory();
+  const { histories } = useWeightHistoriesByUser(userId);
 
   const [currentWeight, setCurrentWeight] = useState<number | "">("");
   const [notes, setNotes] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
+  const [lastWeight, setLastWeight] = useState<number | null>(null);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const progress = goalWeight
-    ? Math.min(((currentWeight as number) / goalWeight) * 100, 100)
-    : 0;
+  // Obtener el último peso registrado cuando cambian los histories
+  useEffect(() => {
+    if (histories.length > 0) {
+      const sorted = [...histories].sort((a, b) => (a.date > b.date ? 1 : -1));
+      setLastWeight(sorted[sorted.length - 1].weight);
+    }
+  }, [histories]);
 
   async function handleSave() {
     if (currentWeight === "" || isNaN(Number(currentWeight))) return;
 
-    setIsSaving(true);
     try {
-      await create({
+      const newHistory = await create({
         userId,
         date: today,
         weight: Number(currentWeight),
         notes: notes || "",
       });
+      setLastWeight(newHistory.weight);
       setCurrentWeight("");
       setNotes("");
       toast({
@@ -76,55 +77,42 @@ export function WeightHabit({ userId, goalWeight }: WeightHabitProps) {
         isClosable: true,
         position: "top-right",
       });
-    } finally {
-      setIsSaving(false);
     }
   }
 
   return (
     <>
-      <Box
-        position="relative"
-        w="64px"
-        h="64px"
+      <VStack
+        spacing={1}
+        w="80px"
         cursor="pointer"
         onClick={onOpen}
         userSelect="none"
       >
-        {isSaving ? (
-          <Spinner size="lg" color="blue.500" />
-        ) : (
-          <CircularProgress
-            value={progress}
-            size="64px"
-            thickness="6px"
+        <Box position="relative" w="64px" h="64px">
+          <Box
+            position="absolute"
+            top="50%"
+            left="50%"
+            transform="translate(-50%, -50%)"
             color="blue.500"
-            trackColor={theme.colors.gray[200]}
-            capIsRound
-          />
-        )}
-        <Box
-          position="absolute"
-          top="50%"
-          left="50%"
-          transform="translate(-50%, -50%)"
-          color="blue.500"
-          fontSize="28px"
-          pointerEvents="none"
-        >
-          <Icon as={FaWeight} />
+            fontSize="28px"
+            pointerEvents="none"
+          >
+            <Icon as={FaWeight} />
+          </Box>
         </Box>
-        <Text
-          position="absolute"
-          bottom="-20px"
-          left="50%"
-          transform="translateX(-50%)"
-          fontSize="sm"
-          color="blue.600"
-        >
+
+        <Text fontSize="sm" color="blue.600">
           Peso
         </Text>
-      </Box>
+
+        {lastWeight !== null && (
+          <Text fontSize="xs" color="gray.500" userSelect="none">
+            {lastWeight}Kg
+          </Text>
+        )}
+      </VStack>
 
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
@@ -154,7 +142,7 @@ export function WeightHabit({ userId, goalWeight }: WeightHabitProps) {
             />
             {errorCreate && (
               <Text fontSize="xs" color="red.500" mt={2}>
-                {errorCreate}
+                {/* {errorCreate} */}
               </Text>
             )}
           </ModalBody>
@@ -164,7 +152,6 @@ export function WeightHabit({ userId, goalWeight }: WeightHabitProps) {
               colorScheme="blue"
               mr={3}
               onClick={handleSave}
-              isLoading={isSaving}
               isDisabled={currentWeight === ""}
             >
               Guardar

@@ -59,7 +59,7 @@ export function UserStatsCard() {
       rounded="md"
       borderWidth="1px"
       borderColor={theme.colors.gray[200]}
-      height="100%"
+      height={{ base: "auto", md: "100%" }} // mobile: auto, desktop: 100%
       display="flex"
       flexDirection="column"
     >
@@ -68,7 +68,7 @@ export function UserStatsCard() {
           maxW="200px"
           flexShrink={0}
           value={selectedCategory}
-          placeholder="Selecciona categoría"
+          // placeholder="Selecciona categoría"
           onChange={(e) => setSelectedCategory(e.target.value)}
         >
           {categories.map(({ label, value }) => (

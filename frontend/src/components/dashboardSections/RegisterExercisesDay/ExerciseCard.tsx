@@ -36,7 +36,8 @@ export function ExerciseCard({ history, base }: ExerciseCardProps) {
     >
       {base.photoUrl && (
         <Image
-          src={base.photoUrl}
+          src={"https://i.pinimg.com/736x/18/67/23/18672311e25fb09ff6e48f78fcc7a6ad.jpg"}
+          // src={base.photoUrl}
           alt={base.name}
           boxSize="80px"
           objectFit="cover"

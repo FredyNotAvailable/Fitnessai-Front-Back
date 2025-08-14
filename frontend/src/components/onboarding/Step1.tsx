@@ -11,7 +11,6 @@ interface Step1Props {
 const genderLabels: Record<string, string> = {
   male: "Hombre",
   female: "Mujer",
-  other: "Otro",
 };
 
 export function Step1({ data, update }: Step1Props) {

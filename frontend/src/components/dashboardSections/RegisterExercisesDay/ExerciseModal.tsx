@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import { useExerciseBases } from "../../../hooks/useExerciseBase";
-import { useExerciseHistoryByUserAndDate } from "../../../hooks/useExerciseHistory";
+import { useExerciseHistoriesByUserAndDate } from "../../../hooks/useExerciseHistory";
 
 interface ExerciseModalProps {
   isOpen: boolean;
@@ -53,7 +53,7 @@ export function ExerciseModal({ isOpen, onClose, userId, date, onSaved }: Exerci
     create,
     loading: saving,
     error: errorSaving,
-  } = useExerciseHistoryByUserAndDate(userId, date);
+  } = useExerciseHistoriesByUserAndDate(userId, date);
 
   const [selectedCategory, setSelectedCategory] = useState<Category>("all");
   const [selectedExerciseId, setSelectedExerciseId] = useState<string>("");

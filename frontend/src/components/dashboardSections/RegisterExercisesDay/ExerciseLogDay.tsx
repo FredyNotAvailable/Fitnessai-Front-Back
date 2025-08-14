@@ -1,12 +1,21 @@
-import { Box, VStack, useTheme, useToast, Heading, Text, Flex, Button } from "@chakra-ui/react";
+import {
+  Box,
+  VStack,
+  useTheme,
+  useToast,
+  Heading,
+  Text,
+  Flex,
+  Button,
+} from "@chakra-ui/react";
 import { useState, useCallback } from "react";
 import { ExerciseModal } from "./ExerciseModal";
 import { useAuth } from "../../../contexts/AuthContext";
-import { useExerciseHistoriesByUser } from "../../../hooks/useExerciseHistory";
+import { useExerciseHistoriesByUserAndDate } from "../../../hooks/useExerciseHistory";
 import { useExerciseBases } from "../../../hooks/useExerciseBase";
 import { ExerciseList } from "./ExerciseList";
 
-// Función simulada para guardar ejercicio
+// Simulación de guardado en backend
 async function saveExerciseToBackend(data: {
   userId: string;
   exerciseBaseId: string;
@@ -29,27 +38,20 @@ export function ExerciseLogDay() {
   const toast = useToast();
   const { user } = useAuth();
 
+  const today = new Date().toISOString().slice(0, 10);
+
   const [modalOpen, setModalOpen] = useState(false);
-  const [refreshFlag, setRefreshFlag] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(false);
 
-  // Aquí pasamos refreshFlag para que se recargue cuando cambie
-  const {
-    histories,
-    loading: loadingHistories,
-    error: errorHistories,
-  } = useExerciseHistoriesByUser(user?.uid ?? "", refreshFlag);
+  const { histories, loading: loadingHistories, error: errorHistories } =
+    useExerciseHistoriesByUserAndDate(user?.uid ?? "", today, refreshKey);
 
-  const {
-    exerciseBases,
-    loading: loadingBases,
-    error: errorBases,
-  } = useExerciseBases();
+  const { exerciseBases, loading: loadingBases, error: errorBases } =
+    useExerciseBases();
 
   const forceRefresh = useCallback(() => {
-    setRefreshFlag(prev => !prev);
+    setRefreshKey((prev) => !prev);
   }, []);
-
-  const today = new Date().toISOString().slice(0, 10);
 
   const handleSave = async (data: {
     userId: string;
@@ -60,8 +62,7 @@ export function ExerciseLogDay() {
     notes: string;
   }) => {
     try {
-      const dataWithDate = { ...data, date: today };
-      await saveExerciseToBackend(dataWithDate);
+      await saveExerciseToBackend({ ...data, date: today });
       toast({
         title: "Ejercicio guardado",
         description: "El ejercicio se registró correctamente.",
@@ -70,11 +71,12 @@ export function ExerciseLogDay() {
         isClosable: true,
       });
       setModalOpen(false);
-      forceRefresh();  // Esto hace que se recargue la lista
+      forceRefresh();
     } catch (error: any) {
       toast({
         title: "Error al guardar",
-        description: error.message || "No se pudo registrar el ejercicio.",
+        description:
+          error?.message || "No se pudo registrar el ejercicio.",
         status: "error",
         duration: 4000,
         isClosable: true,
@@ -92,32 +94,36 @@ export function ExerciseLogDay() {
       shadow="lg"
       borderWidth="1px"
       borderColor={theme.colors.gray[200]}
+      height="600px"
       maxHeight="600px"
-      height="800px"
       display="flex"
       flexDirection="column"
     >
       <VStack spacing={6} align="stretch" flex="1" overflow="hidden">
-        {/* Header fijo */}
+        {/* Encabezado */}
         <Box flexShrink={0}>
           <Heading size="lg" color="primary.900" mb={2}>
-            Registro de ejercicios
+            Registra tus ejercicios diarios
           </Heading>
           <Text color="gray.600" mb={4}>
-            Aquí puedes registrar tus ejercicios realizados hoy y ver el historial reciente.
+            Aquí puedes registrar tus ejercicios realizados hoy y ver el
+            historial reciente.
           </Text>
 
           <Flex align="center" justify="space-between" mb={4}>
             <Heading size="md" color="primary.700">
               Ejercicios realizados
             </Heading>
-            <Button colorScheme="primary" onClick={() => setModalOpen(true)}>
+            <Button
+              colorScheme="primary"
+              onClick={() => setModalOpen(true)}
+            >
               Registrar ejercicio
             </Button>
           </Flex>
         </Box>
 
-        {/* Contenedor scrollable solo para la lista */}
+        {/* Lista scrollable */}
         <Box
           flex="1"
           overflowY="auto"
@@ -134,6 +140,7 @@ export function ExerciseLogDay() {
         </Box>
       </VStack>
 
+      {/* Modal */}
       <ExerciseModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
